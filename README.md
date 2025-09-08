@@ -46,15 +46,12 @@ A modern RSS feed aggregator built with Go, featuring real-time feed updates, us
 ### 1. Clone and Setup
 
 ```bash
-git clone <your-repo>
+git clone https://github.com/shivamg7753/BlogAggregator.git
 cd blogAggregator
 ```
 
 ### 2. Configure Environment
 
-```bash
-# Copy environment template
-cp env.example .env
 
 # Edit .env file with your settings
 ```
@@ -71,15 +68,6 @@ JWT_SECRET
 
 ### 3. Deploy
 
-```bash
-# Make deployment script executable
-chmod +x deploy.sh
-
-# Run deployment
-./deploy.sh
-```
-
-Or manually:
 
 ```bash
 # Start services
