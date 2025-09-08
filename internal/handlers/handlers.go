@@ -257,6 +257,31 @@ func SubscribeFeed(c *gin.Context) {
 	c.JSON(http.StatusCreated, sub)
 }
 
+// UnsubscribeFeed
+// @Summary      Unsubscribe from a feed
+// @Tags         subscriptions
+// @Accept       json
+// @Produce      json
+// @Param        input body SubscribeInput true "Subscription"
+// @Success      200 {object} map[string]string
+// @Failure      401 {object} map[string]string
+// @Router       /subscriptions [delete]
+func UnsubscribeFeed(c *gin.Context) {
+    var input SubscribeInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Delete by user and feed
+    result := database.DB.Where("user_id = ? AND feed_id = ?", input.UserID, input.FeedID).Delete(&models.Subscription{})
+    if result.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"message": "unsubscribed"})
+}
+
 // GetUserFeed
 // @Summary      Get personalized feed
 // @Tags         users

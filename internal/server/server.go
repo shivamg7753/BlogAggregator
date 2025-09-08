@@ -32,6 +32,7 @@ func NewRouter() *gin.Engine {
 	r.POST("/users/register", handlers.RegisterUser)
 	r.POST("/users", handlers.CreateUser)
 	authRoutes.POST("/subscriptions", handlers.SubscribeFeed)
+	authRoutes.DELETE("/subscriptions", handlers.UnsubscribeFeed)
 	authRoutes.GET("/users/:id/feed", handlers.GetUserFeed)
 
 	//feeds

@@ -47,6 +47,11 @@ export const subscribe = async ({ user_id, feed_id }) => {
   return data
 }
 
+export const unsubscribe = async ({ user_id, feed_id }) => {
+  const { data } = await api.delete('/subscriptions', { data: { user_id, feed_id } })
+  return data
+}
+
 export const userFeed = async ({ user_id, page = 1, limit = 10 }) => {
   const { data } = await api.get(`/users/${user_id}/feed?page=${page}&limit=${limit}`)
   return data

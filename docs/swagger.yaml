@@ -207,6 +207,34 @@ paths:
       tags:
       - posts
   /subscriptions:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Subscription
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.SubscribeInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Unsubscribe from a feed
+      tags:
+      - subscriptions
     post:
       consumes:
       - application/json

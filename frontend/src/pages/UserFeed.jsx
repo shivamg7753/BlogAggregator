@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { userFeed, listFeeds, subscribe, createFeed } from '../api.js'
+import { userFeed, listFeeds, subscribe, unsubscribe, createFeed } from '../api.js'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function UserFeed() {
@@ -56,6 +56,22 @@ export default function UserFeed() {
     }
   }
 
+  const onUnsubscribe = async (feedId) => {
+    try {
+      setMessage('')
+      if (!isAuthenticated || !user) {
+        setMessage('You are not logged in')
+        return
+      }
+      await unsubscribe({ user_id: user.id, feed_id: feedId })
+      setMessage('Unsubscribed')
+      setSubscribedIds(prev => { const s = new Set(prev); s.delete(feedId); return s })
+      await load()
+    } catch (e) {
+      setMessage(e?.response?.data?.error || 'Failed to unsubscribe')
+    }
+  }
+
   const onAddAndSubscribe = async (e) => {
     e.preventDefault()
     try {
@@ -97,9 +113,11 @@ export default function UserFeed() {
                         <a className="text-xs text-primary" href={f.url} target="_blank">{f.url}</a>
                       </div>
                       <div className="ml-auto flex gap-2">
-                        <button className="btn btn-primary btn-sm" onClick={() => onSubscribe(f.id)} disabled={subscribedIds.has(f.id)}>
-                          {subscribedIds.has(f.id) ? 'Subscribed' : 'Subscribe'}
-                        </button>
+                        {subscribedIds.has(f.id) ? (
+                          <button className="btn btn-outline btn-sm" onClick={() => onUnsubscribe(f.id)}>Unsubscribe</button>
+                        ) : (
+                          <button className="btn btn-primary btn-sm" onClick={() => onSubscribe(f.id)}>Subscribe</button>
+                        )}
                       </div>
                     </div>
                   </li>
