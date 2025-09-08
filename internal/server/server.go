@@ -11,7 +11,8 @@ import (
 )
 
 func NewRouter() *gin.Engine {
-	r := gin.Default()
+    r := gin.Default()
+    r.SetTrustedProxies(nil)
 
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

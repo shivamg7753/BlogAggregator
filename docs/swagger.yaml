@@ -1,4 +1,320 @@
+basePath: /
+definitions:
+  blogAggregator_internal_models.Feed:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      last_fetched:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  blogAggregator_internal_models.Post:
+    properties:
+      content:
+        type: string
+      feed_id:
+        type: integer
+      id:
+        type: integer
+      link:
+        type: string
+      published:
+        type: string
+      title:
+        type: string
+    type: object
+  blogAggregator_internal_models.Subscription:
+    properties:
+      feed_id:
+        type: integer
+      id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  blogAggregator_internal_models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  internal_handlers.CreateUserInput:
+    properties:
+      username:
+        type: string
+    type: object
+  internal_handlers.FeedCreateInput:
+    properties:
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  internal_handlers.LoginInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_handlers.RefreshFeedInput:
+    properties:
+      feed_id:
+        type: integer
+    type: object
+  internal_handlers.RegisterInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_handlers.SubscribeInput:
+    properties:
+      feed_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+host: localhost:8080
 info:
   contact: {}
-paths: {}
+  description: API for managing RSS feeds, users, and subscriptions
+  title: Blog Aggregator API
+  version: "1.0"
+paths:
+  /feeds:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/blogAggregator_internal_models.Feed'
+            type: array
+      summary: List feeds
+      tags:
+      - feeds
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Feed
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.FeedCreateInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/blogAggregator_internal_models.Feed'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create feed
+      tags:
+      - feeds
+  /feeds/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Feed to refresh
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.RefreshFeedInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh a feed
+      tags:
+      - feeds
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User login
+      tags:
+      - auth
+  /posts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/blogAggregator_internal_models.Post'
+            type: array
+      summary: List latest posts
+      tags:
+      - posts
+  /subscriptions:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Subscription
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.SubscribeInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/blogAggregator_internal_models.Subscription'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Subscribe to a feed
+      tags:
+      - subscriptions
+  /users:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.CreateUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/blogAggregator_internal_models.User'
+      summary: Create user (internal/demo)
+      tags:
+      - users
+  /users/{id}/feed:
+    get:
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get personalized feed
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: User payload
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/blogAggregator_internal_models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register user
+      tags:
+      - auth
+schemes:
+- http
 swagger: "2.0"

@@ -11,6 +11,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Request DTOs for Swagger
+type RegisterInput struct {
+    Username string `json:"username"`
+    Email    string `json:"email"`
+    Password string `json:"password"`
+}
+
+type FeedCreateInput struct {
+    Title string `json:"title"`
+    URL   string `json:"url"`
+}
+
+type RefreshFeedInput struct {
+    FeedId uint `json:"feed_id"`
+}
+
+type CreateUserInput struct {
+    UserName string `json:"username"`
+}
+
+type SubscribeInput struct {
+    UserID uint `json:"user_id"`
+    FeedID uint `json:"feed_id"`
+}
+
+type LoginInput struct {
+    Username string `json:"username"`
+    Password string `json:"password"`
+}
+
+// RegisterUser
+// @Summary      Register user
+// @Description  Create a new user account
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body  RegisterInput  true  "User payload"
+// @Success      201    {object}  models.User
+// @Failure      400    {object}  map[string]string
+// @Router       /users/register [post]
 func RegisterUser(c *gin.Context) {
 	var input struct {
 		Username string `json:"username" binding:"required"`
@@ -54,6 +94,15 @@ func RegisterUser(c *gin.Context) {
 
 //add feed
 
+// CreateFeed
+// @Summary      Create feed
+// @Tags         feeds
+// @Accept       json
+// @Produce      json
+// @Param        input  body  FeedCreateInput  true  "Feed"
+// @Success      201    {object}  models.Feed
+// @Failure      400    {object}  map[string]string
+// @Router       /feeds [post]
 func CreateFeed(c *gin.Context) {
 	var input struct {
 		Title string `json:"title" binding:"required"`
@@ -79,6 +128,12 @@ func CreateFeed(c *gin.Context) {
 
 //list feed
 
+// ListFeeds
+// @Summary      List feeds
+// @Tags         feeds
+// @Produce      json
+// @Success      200  {array}  models.Feed
+// @Router       /feeds [get]
 func ListFeeds(c *gin.Context) {
 	var feeds []models.Feed
 	err := database.DB.Find(&feeds).Error
@@ -91,6 +146,15 @@ func ListFeeds(c *gin.Context) {
 	c.JSON(http.StatusOK, feeds)
 }
 
+// RefreshFeed
+// @Summary      Refresh a feed
+// @Tags         feeds
+// @Accept       json
+// @Produce      json
+// @Param        input body RefreshFeedInput true "Feed to refresh"
+// @Success      200  {object} map[string]string
+// @Failure      400  {object} map[string]string
+// @Router       /feeds/refresh [post]
 func RefreshFeed(c *gin.Context) {
 	var input struct {
 		FeedId uint `json:"feed_id" binding:"required"`
@@ -119,12 +183,26 @@ func RefreshFeed(c *gin.Context) {
 	})
 }
 
+// ListPosts
+// @Summary      List latest posts
+// @Tags         posts
+// @Produce      json
+// @Success      200  {array}  models.Post
+// @Router       /posts [get]
 func ListPosts(c *gin.Context) {
 	var posts []models.Post
 	database.DB.Order("published desc").Limit(20).Find(&posts)
 	c.JSON(http.StatusOK, posts)
 }
 
+// CreateUser
+// @Summary      Create user (internal/demo)
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        input body CreateUserInput true "User"
+// @Success      201 {object} models.User
+// @Router       /users [post]
 func CreateUser(c *gin.Context) {
 	var input struct {
 		UserName string `json:"username" binding:"required"`
@@ -145,6 +223,15 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
+// SubscribeFeed
+// @Summary      Subscribe to a feed
+// @Tags         subscriptions
+// @Accept       json
+// @Produce      json
+// @Param        input body SubscribeInput true "Subscription"
+// @Success      201 {object} models.Subscription
+// @Failure      401 {object} map[string]string
+// @Router       /subscriptions [post]
 func SubscribeFeed(c *gin.Context) {
 	var input struct {
 		UserID uint `json:"user_id" binding:"required"`
@@ -170,6 +257,16 @@ func SubscribeFeed(c *gin.Context) {
 	c.JSON(http.StatusCreated, sub)
 }
 
+// GetUserFeed
+// @Summary      Get personalized feed
+// @Tags         users
+// @Produce      json
+// @Param        id    path      int     true  "User ID"
+// @Param        page  query     int     false "Page"
+// @Param        limit query     int     false "Limit"
+// @Success      200   {object}  map[string]interface{}
+// @Failure      401   {object}  map[string]string
+// @Router       /users/{id}/feed [get]
 func GetUserFeed(c *gin.Context) {
 	userId := c.GetUint("User_id")
 
@@ -202,6 +299,15 @@ func GetUserFeed(c *gin.Context) {
 	})
 }
 
+// Login
+// @Summary      User login
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input body LoginInput true "Credentials"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]string
+// @Router       /login [post]
 func Login(c *gin.Context) {
 	var input struct {
 		Username string `json:"username" binding:"required"`
