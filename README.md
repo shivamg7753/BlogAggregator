@@ -57,17 +57,16 @@ cd blogAggregator
 cp env.example .env
 
 # Edit .env file with your settings
-nano .env
 ```
 
 **Required Environment Variables:**
 ```env
-POSTGRES_USER=bloguser
-POSTGRES_PASSWORD=blogpassword123
-POSTGRES_DB=blogaggregator
-dsn=postgres://bloguser:blogpassword123@db:5432/blogaggregator?sslmode=disable
-PORT=8080
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
+dsn
+PORT
+JWT_SECRET
 ```
 
 ### 3. Deploy
